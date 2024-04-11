@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Invoice</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto px-4 mt-8">
+    <div class="invoice-box bg-white rounded-lg shadow-lg p-8">
+        <div class="flex justify-between">
+            <h1 class="text-3xl font-semibold">Invoice</h1>
+            <!-- Search input inside the invoice box -->
+            <input type="text" class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500" placeholder="Search...">
+        </div>
+        <div class="invoice-details grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div>
+                <h3 class="text-lg font-semibold mb-2">To:</h3>
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500" placeholder="Customer Name">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Customer Address">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Customer City, Postal Code">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Customer Country">
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Invoice Details:</h3>
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500" placeholder="Invoice Number">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Invoice Date">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Due Date">
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">From:</h3>
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500" placeholder="Your Company Name">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Your Company Address">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Your Company City, Postal Code">
+                <input type="text" class="form-input block w-full rounded-md border-gray-300 focus:border-blue-500 mt-2" placeholder="Your Company Country">
+            </div>
+        </div>
+        <div class="add-delete-buttons mt-6">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="addRow()">Add Row</button>
+            <button class="bg-red-500 text-white px-4 py-2 rounded-md" onclick="deleteSelectedRows()">Delete Selected Rows</button>
+        </div>
+        <table class="border-collapse w-full border border-black mt-6">
+            <thead>
+                <tr class="border border-black">
+                    <th class="border border-black px-4 py-2"></th>
+                    <th class="border border-black px-4 py-2">Name</th>
+                    <th class="border border-black px-4 py-2">Quantity</th>
+                    <th class="border border-black px-4 py-2">Unit</th>
+                    <th class="border border-black px-4 py-2">Unit Price</th>
+                    <th class="border border-black px-4 py-2">Discount (%)</th>
+                    <th class="border border-black px-4 py-2">CGST (%)</th>
+                    <th class="border border-black px-4 py-2">SGST (%)</th>
+                    <th class="border border-black px-4 py-2">Total</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTable">
+                <!-- Placeholder row for adding new rows -->
+            </tbody>
+        </table>
+        <div class="invoice-total mt-6">
+            <p><strong>Total CGST:</strong> <span id="totalCGST">0 INR</span></p>
+            <p><strong>Total SGST:</strong> <span id="totalSGST">0 INR</span></p>
+            <p><strong>Subtotal:</strong> <span id="subtotal">0 INR</span></p>
+            <p><strong>Total:</strong> <span id="total">0 INR</span></p>
+        </div>
+       
+        <h3 class="text-left mt-6"><b>Terms and Conditions</b></h3>
+        <ul class="text-left">
+            <li>All payments are due within 30 days.</li>
+            <li>Goods remain the property of [Your Company Name] until fully paid for.</li>
+            <li>Returns and refunds are subject to our company's return policy.</li>
+            <li>[Your Company Name] reserves the right to charge interest on overdue invoices.</li>
+            <li>Any disputes arising from this invoice are subject to the jurisdiction of [Your Jurisdiction].</li>
+        </ul>
+
+        <!-- Submit Button -->
+        <div class="invoice-submit mt-6 text-center">
+            <button type="submit" class="bg-green-500 text-white px-8 py-3 rounded-lg">Submit Invoice</button>
+        </div>
+    </div>
+</div>
+
+<script>
+  function addRow() {
+      var table = document.getElementById("invoiceTable");
+      var newRow = table.insertRow();
+      var cells = [];
+      for (var i = 0; i < 9; i++) {
+          cells.push(newRow.insertCell(i));
+      }
+      cells[0].innerHTML = "<input type='checkbox' class='form-check-input rowCheckbox'>";
+      cells[1].innerHTML = "<input type='text' class='form-control productName w-full text-center' placeholder='Product Name'>";
+      cells[2].innerHTML = "<input type='number' class='form-control quantity w-full text-center' placeholder='' onchange='calculateRowTotal(this.parentNode.parentNode)'>";
+      cells[3].innerHTML = "<input type='text' class='form-control unit w-full text-center' placeholder=''>";
+      cells[4].innerHTML = "<input type='number' class='form-control unitPrice w-full text-center' placeholder='' onchange='calculateRowTotal(this.parentNode.parentNode)'>";
+      cells[5].innerHTML = "<input type='number' class='form-control discount w-full text-center' placeholder='' onchange='calculateRowTotal(this.parentNode.parentNode)'>";
+      cells[6].innerHTML = "<input type='number' class='form-control cgst w-full text-center' placeholder='' onchange='calculateRowTotal(this.parentNode.parentNode)'>";
+      cells[7].innerHTML = "<input type='number' class='form-control sgst w-full text-center' placeholder='' onchange='calculateRowTotal(this.parentNode.parentNode)'>";
+      cells[8].innerHTML = "<span class='row-total'>0</span>"; // New cell for the row total
+  }
+  
+  function deleteSelectedRows() {
+      var checkboxes = document.getElementsByClassName("rowCheckbox");
+      for (var i = checkboxes.length - 1; i >= 0; i--) {
+          if (checkboxes[i].checked) {
+              var row = checkboxes[i].parentNode.parentNode;
+              row.parentNode.removeChild(row);
+          }
+      }
+  }
+  
+  function calculateRowTotal(row) {
+      var quantity = parseFloat(row.querySelector(".quantity").value) || 0;
+      var unitPrice = parseFloat(row.querySelector(".unitPrice").value) || 0;
+      var discount = parseFloat(row.querySelector(".discount").value) || 0;
+      var cgst = parseFloat(row.querySelector(".cgst").value) || 0;
+      var sgst = parseFloat(row.querySelector(".sgst").value) || 0;
+  
+      var subtotal = (quantity * unitPrice) - ((quantity * unitPrice * discount) / 100);
+      var totalCGST = (subtotal * cgst) / 100;
+      var totalSGST = (subtotal * sgst) / 100;
+      var total = subtotal + totalCGST + totalSGST;
+  
+      row.querySelector(".row-total").textContent = total.toFixed(2); // Display total with two decimal places
+      
+      // Calculate totals for CGST, SGST, Subtotal, and Total
+      calculateTotals();
+  }
+  
+  function calculateTotals() {
+      var rows = document.querySelectorAll("#invoiceTable tr");
+      var totalCGST = 0;
+      var totalSGST = 0;
+      var subtotal = 0;
+      var total = 0;
+  
+      rows.forEach(function(row) {
+          var rowTotal = parseFloat(row.querySelector(".row-total").textContent) || 0;
+          totalCGST += parseFloat(row.querySelector(".cgst").value) || 0;
+          totalSGST += parseFloat(row.querySelector(".sgst").value) || 0;
+          subtotal += rowTotal;
+      });
+  
+      total = subtotal + totalCGST + totalSGST;
+  
+      // Update the total CGST, total SGST, subtotal, and total fields
+      document.getElementById("totalCGST").textContent = totalCGST.toFixed(2) + " INR";
+      document.getElementById("totalSGST").textContent = totalSGST.toFixed(2) + " INR";
+      document.getElementById("subtotal").textContent = subtotal.toFixed(2) + " INR";
+      document.getElementById("total").textContent = total.toFixed(2) + " INR";
+  }
+</script>
+
+</body>
+</html>
